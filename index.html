@@ -87,8 +87,26 @@
     }
 
     /* initial positions */
-    #yesBtn { left:calc(50% + 80px); top:50%; }
-    #noBtn  { left:calc(50% - 80px); top:50%; }
+    #yesBtn { left:calc(50% + 80px); top:58%; } /* slightly lower so centered GIF doesn't overlap */
+    #noBtn  { left:calc(50% - 80px); top:58%; }
+
+    /* centered GIF (visible in middle of stage) */
+    .center-gif{
+      position:absolute;
+      left:50%;
+      top:42%;               /* adjust this if you want it higher/lower */
+      transform:translate(-50%,-50%);
+      width:220px;
+      height:220px;
+      object-fit:cover;
+      border-radius:14px;
+      box-shadow:0 18px 50px rgba(120,40,70,0.12);
+      cursor:pointer;
+      z-index:20;            /* above buttons so it's visible/clickable */
+      pointer-events:auto;
+      border: 4px solid rgba(255,255,255,0.9);
+      background:#fff;
+    }
 
     /* photo gallery for no-clicks (bottom-left) */
     .no-gallery {
@@ -101,6 +119,7 @@
       max-width:40%;
       max-height:40%;
       overflow:hidden;
+      z-index:5;
     }
     .no-gallery img {
       width:84px;
@@ -131,6 +150,7 @@
       pointer-events:none;
       opacity:0;
       transition: opacity 350ms;
+      z-index:6;
     }
     .yes-overlay.show {
       opacity:1;
@@ -149,7 +169,7 @@
     .yes-overlay.show img { transform:scale(1); }
     .yes-overlay img:hover { transform: scale(1.04); box-shadow: 0 18px 50px rgba(120,40,70,0.2); }
 
-    /* popup (center big photo) */
+    /* popup (center big photo/GIF) */
     .popup {
       position:fixed;
       inset:0;
@@ -184,8 +204,9 @@
     .popup-card img {
       width:100%;
       height:100%;
-      object-fit:cover;
+      object-fit:contain;
       display:block;
+      background: #000;
     }
     .popup-close {
       position:absolute;
@@ -247,6 +268,7 @@
 
     /* responsive */
     @media (max-width:600px){
+      .center-gif{ width:140px; height:140px; top:36%; }
       .yes-overlay img { width:120px; height:88px; }
       .no-gallery img { width:64px; height:50px; }
       #yesBtn, #noBtn { padding:10px 14px; font-size:16px; }
@@ -264,6 +286,9 @@
         <button id="yesBtn" class="btn yes" aria-label="Yes button">Yes</button>
       </div>
 
+      <!-- Center GIF (replace assets/center.gif with your file or a URL) -->
+      <img id="centerGif" class="center-gif" src="assets/center.gif" alt="Surprise GIF — click to open" role="button" tabindex="0" aria-label="Open GIF" />
+
       <div class="no-gallery" id="noGallery" aria-hidden="true"></div>
 
       <div class="yes-overlay" id="yesOverlay" aria-hidden="true">
@@ -278,7 +303,7 @@
 
   <!-- Popup element (hidden until used) -->
   <div id="popup" class="popup" aria-hidden="true">
-    <div class="popup-card" role="dialog" aria-modal="true" aria-label="Photo popup">
+    <div class="popup-card" role="dialog" aria-modal="true" aria-label="Photo/GIF popup">
       <img id="popupImg" alt="Large view" />
     </div>
     <button id="popupClose" class="popup-close" aria-label="Close">✕</button>
@@ -294,6 +319,8 @@
     const yesImg1 = document.getElementById('yesImg1');
     const yesImg2 = document.getElementById('yesImg2');
     const yesImg3 = document.getElementById('yesImg3');
+
+    const centerGif = document.getElementById('centerGif');
 
     const popup = document.getElementById('popup');
     const popupImg = document.getElementById('popupImg');
@@ -312,6 +339,7 @@
       "assets/yes3.jpg"
     ];
     const musicUrl = "assets/music.mp3";
+    // center GIF path is in the img src attribute above (assets/center.gif)
     // ===================================================================
 
     const pleadingPhrases = [
@@ -332,16 +360,13 @@
 
     function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-    // Show popup with a large image. autoCloseMs optional — if given it auto-closes.
-    function showPopup(src, autoCloseMs = 1200) {
+    // Show popup with a large image/GIF. autoCloseMs optional (0 => manual close)
+    function showPopup(src, autoCloseMs = 0) {
+      if (!src) return;
       popupImg.src = src + (src.includes('?') ? '&' : '?') + 'rand=' + Date.now();
       popup.classList.add('show');
       popup.setAttribute('aria-hidden', 'false');
 
-      // play a subtle pop sound? (commented out — optional)
-      // new Audio('assets/pop.mp3').play().catch(()=>{});
-
-      // auto-close if requested
       if (autoCloseMs && autoCloseMs > 0) {
         setTimeout(hidePopup, autoCloseMs);
       }
@@ -350,17 +375,21 @@
     function hidePopup() {
       popup.classList.remove('show');
       popup.setAttribute('aria-hidden', 'true');
-      // remove src to free memory (after animation)
       setTimeout(() => { popupImg.src = ''; }, 300);
     }
 
     popupClose.addEventListener('click', hidePopup);
-    popup.addEventListener('click', (e) => {
-      // clicking outside the image also closes
-      if (e.target === popup || e.target === popupImg) hidePopup();
-    });
-    // close with ESC
+    popup.addEventListener('click', (e) => { if (e.target === popup) hidePopup(); });
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape') hidePopup(); });
+
+    // Make center GIF open popup on click or keyboard (Enter/Space)
+    centerGif.addEventListener('click', () => showPopup(centerGif.src, 0));
+    centerGif.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        showPopup(centerGif.src, 0);
+      }
+    });
 
     // When No is clicked
     noBtn.addEventListener('click', (e) => {
@@ -432,7 +461,6 @@
 
       // pop it to the center briefly for Mai
       if (popupNow) {
-        // small delay so thumb appears then popup
         setTimeout(() => showPopup(src, 1400), 220);
       }
     }
@@ -505,15 +533,15 @@
       const rect = stage.getBoundingClientRect();
       const centerX = Math.floor(rect.width/2);
       const centerY = Math.floor(rect.height/2);
+      // buttons sit slightly lower than exact center to make room for center GIF
       noBtn.style.left = (centerX - 80) + 'px';
-      noBtn.style.top = (centerY) + 'px';
+      noBtn.style.top = (centerY + Math.round(rect.height*0.08)) + 'px';
       yesBtn.style.left = (centerX + 80) + 'px';
-      yesBtn.style.top = (centerY) + 'px';
+      yesBtn.style.top = (centerY + Math.round(rect.height*0.08)) + 'px';
       noBtn.style.transform = 'translate(-50%,-50%)';
       yesBtn.style.transform = 'translate(-50%,-50%) scale(1)';
     }
 
-    // re-position on load/resize
     window.addEventListener('load', initButtonPositions);
     window.addEventListener('resize', initButtonPositions);
   </script>
