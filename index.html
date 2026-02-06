@@ -173,12 +173,12 @@
     .yes-overlay.show img { transform:scale(1); }
     .yes-overlay img:hover { transform: scale(1.04); box-shadow: 0 18px 50px rgba(120,40,70,0.2); }
 
-    /* Love letter button — absolute inside stage; shown after Yes, placed below yes photos and above buttons */
+    /* Love letter button — absolute inside stage; shown after Yes, placed under yes photos and above buttons */
     .love-letter-btn {
       position:absolute;
       left:50%;
       transform:translate(-50%,0);
-      z-index:25;
+      z-index:12;
       padding:18px 28px;
       border-radius:18px;
       border:0;
@@ -537,7 +537,6 @@ u are the best thing that happened to me
         const stageRect = stage.getBoundingClientRect();
         const relTop = Math.max(0, hRect.top - stageRect.top);
         const relBottom = Math.max(0, hRect.bottom - stageRect.top);
-        // only add if header overlaps the stage vertical span
         forbidden.push({ left: 0, top: 0, right: rect.width, bottom: Math.min(rect.height, relBottom + 6) });
       }
 
@@ -714,7 +713,7 @@ u are the best thing that happened to me
         overlayRect = yesOverlay.getBoundingClientRect();
       }
 
-      // Determine safe Y: place love button just below overlay's bottom, but above the buttons
+      // Determine buttons region
       const buttonsRect = {
         left: Math.min(yesBtn.getBoundingClientRect().left, noBtn.getBoundingClientRect().left),
         right: Math.max(yesBtn.getBoundingClientRect().right, noBtn.getBoundingClientRect().right),
@@ -725,23 +724,33 @@ u are the best thing that happened to me
       // convert to stage-relative
       const stageLeft = rect.left;
       const stageTop = rect.top;
+      const overlayTopRel = overlayRect ? (overlayRect.top - stageTop) : Math.floor(rect.height / 2);
       const overlayBottomRel = overlayRect ? (overlayRect.bottom - stageTop) : Math.floor(rect.height / 2);
       const buttonsTopRel = (buttonsRect.top - stageTop);
 
-      // desired top: midway between overlay bottom and buttons top, with padding
+      // desired top: normally below overlay bottom but we move it UP more so it's more visible
       const gap = 12;
-      let desiredY = overlayBottomRel + gap + 0; // start just below overlay
-      // ensure desiredY + btnHeight/2 < buttonsTopRel - gap
+      let desiredY = overlayBottomRel + gap;
+
+      // Move the button up by an extra offset so it sits higher (user requested)
+      const extraUp = 60; // move up 60px from the usual spot
+      desiredY = desiredY - extraUp;
+
+      // Ensure it doesn't overlap overlay (if moving up too far)
+      const minY = (overlayTopRel + gap) > 0 ? (overlayTopRel + gap) : (rect.height * 0.35);
+      if (desiredY < minY) desiredY = minY;
+
+      // Ensure it stays above the buttons area
       const btnHeight = loveLetterBtn.getBoundingClientRect().height || 48;
       const maxAllowed = buttonsTopRel - gap - (btnHeight / 2);
       if (desiredY > maxAllowed) {
-        // fallback: put slightly above buttons
-        desiredY = Math.max(overlayBottomRel + gap, maxAllowed - 4);
+        desiredY = Math.max(minY, maxAllowed - 6);
       }
+
       // clamp within stage
       desiredY = Math.max(btnHeight/2 + 8, Math.min(rect.height - btnHeight/2 - 8, desiredY));
 
-      // set position
+      // set position (stage-relative)
       loveLetterBtn.style.left = (rect.width / 2) + "px";
       loveLetterBtn.style.top = desiredY + "px";
       loveLetterBtn.style.display = 'inline-block';
@@ -752,16 +761,11 @@ u are the best thing that happened to me
         { transform: 'translate(-50%,8px) scale(.94)', opacity: 0 },
         { transform: 'translate(-50%,0) scale(1)', opacity: 1 }
       ], { duration: 420, easing: 'cubic-bezier(.2,.9,.2,1)' });
-
-      // ensure noBtn won't try to move into the love button right away by briefly avoiding it
     }
 
     // Bind love letter open
     loveLetterBtn.addEventListener('click', showLetter);
     loveLetterBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showLetter(); } });
-
-    // ensure overlay images open popup (set when yes clicked)
-    // ensure no-gallery thumbs set on addNoGalleryPhoto
 
   </script>
 </body>
