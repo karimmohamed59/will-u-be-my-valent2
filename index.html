@@ -12,6 +12,7 @@
       --paper: #fff8f5;
       --ink: #3b1f2b;
     }
+
     html,body{
       height:100%;
       margin:0;
@@ -26,33 +27,37 @@
     .card{
       position:relative;
       width:min(920px, 95vw);
-      height:min(680px, 85vh);
+      height:min(680px, 95vh);
       background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,240,246,0.9));
       border-radius:18px;
       box-shadow: 0 12px 40px rgba(120,40,70,0.12);
-      padding:28px;
+      padding:22px;
       overflow:hidden;
       border:1px solid rgba(255,255,255,0.6);
+      display:flex;
+      flex-direction:column;
+    }
+
+    header {
+      text-align:center;
+      margin-bottom:6px;
     }
 
     h1{
-      margin:0;
-      font-size:clamp(24px, 3vw, 40px);
+      margin:6px 0 0 0;
+      font-size:clamp(22px, 3vw, 36px);
       letter-spacing:0.4px;
       color:#5a2336;
-      text-align:center;
     }
     p.lead{
-      text-align:center;
-      margin:12px 0 20px;
+      margin:8px 0 18px 0;
       color:var(--muted);
-      font-size:clamp(14px, 1.6vw, 18px);
+      font-size:clamp(13px, 1.2vw, 16px);
     }
 
     .stage {
       position:relative;
-      width:100%;
-      height:62%;
+      flex: 1 1 auto;
       border-radius:12px;
       background: radial-gradient(circle at 10% 20%, rgba(255,255,255,0.65), transparent 10%),
                   linear-gradient(180deg, rgba(255,240,246,0.6), rgba(255, 245, 248, 0.2));
@@ -61,13 +66,14 @@
       justify-content:center;
       overflow:hidden;
       user-select:none;
+      padding:18px;
     }
 
     .btn {
       appearance:none;
       border:0;
-      padding:14px 22px;
-      font-size:18px;
+      padding:12px 20px;
+      font-size:17px;
       border-radius:999px;
       cursor:pointer;
       box-shadow: 0 8px 18px rgba(120,40,70,0.12);
@@ -89,21 +95,21 @@
       border:2px solid rgba(255,77,109,0.12);
     }
 
-    /* buttons sit lower than the stage center so the center GIF has space */
-    #yesBtn { left:calc(50% + 80px); top:68%; }
-    #noBtn  { left:calc(50% - 80px); top:68%; }
+    /* adjusted button positions (down a bit to avoid center asset) */
+    #yesBtn { left:calc(50% + 80px); top:72%; }
+    #noBtn  { left:calc(50% - 80px); top:72%; }
 
-    /* centered GIF (higher on screen so it doesn't overlap buttons) */
+    /* centered GIF — made smaller and higher so it doesn't overlap header or buttons */
     .center-gif{
       position:absolute;
       left:50%;
-      top:32%;
+      top:30%;                 /* higher in the stage but not too high */
       transform:translate(-50%,-50%);
-      width:240px;
-      height:240px;
+      width:180px;             /* smaller so it doesn't dominate or overlap */
+      height:180px;
       object-fit:cover;
-      border-radius:12px;
-      box-shadow:0 18px 50px rgba(120,40,70,0.12);
+      border-radius:10px;
+      box-shadow:0 18px 40px rgba(120,40,70,0.10);
       cursor:pointer;
       z-index:20;
       pointer-events: auto;
@@ -136,10 +142,7 @@
       cursor: pointer;
       background: transparent;
     }
-    .no-gallery img.show {
-      opacity:1;
-      transform: translateY(0) scale(1);
-    }
+    .no-gallery img.show { opacity:1; transform: translateY(0) scale(1); }
 
     /* overlay for yes result (shows 3 photos) */
     .yes-overlay {
@@ -155,10 +158,7 @@
       transition: opacity 350ms;
       z-index:6;
     }
-    .yes-overlay.show {
-      opacity:1;
-      pointer-events:auto;
-    }
+    .yes-overlay.show { opacity:1; pointer-events:auto; }
     .yes-overlay img {
       width:220px;
       height:140px;
@@ -173,23 +173,29 @@
     .yes-overlay.show img { transform:scale(1); }
     .yes-overlay img:hover { transform: scale(1.04); box-shadow: 0 18px 50px rgba(120,40,70,0.2); }
 
-    /* Love letter button (appears after yes) */
-    .love-letter-btn {
-      position:absolute;
-      bottom:14%;
-      left:50%;
-      transform:translate(-50%,0);
+    /* Love letter area — moved below stage to avoid overlapping yes photos */
+    .love-letter-wrap {
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      margin-top:12px;
       z-index:12;
-      padding:12px 18px;
-      border-radius:12px;
-      border:0;
-      background: linear-gradient(90deg,#ffd6e0,#ff9fb8);
-      color:#5a2336;
-      font-weight:700;
-      cursor:pointer;
-      box-shadow: 0 12px 28px rgba(200,80,110,0.12);
-      display:none; /* shown after yes */
+      pointer-events:auto;
     }
+    .love-letter-btn {
+      padding:14px 22px;
+      border-radius:14px;
+      border:0;
+      background: linear-gradient(90deg,#ffb3c7,#ff6b90);
+      color:#fff;
+      font-weight:800;
+      font-size:18px;
+      cursor:pointer;
+      box-shadow: 0 14px 36px rgba(255,100,140,0.18);
+      display:none; /* becomes visible after Yes */
+      transform-origin:center;
+    }
+    .love-letter-btn:focus { outline: 3px solid rgba(255,110,150,0.18); }
 
     /* popup (center big photo/GIF) */
     .popup {
@@ -205,10 +211,7 @@
       transition: opacity 250ms ease;
       backdrop-filter: blur(6px) saturate(120%);
     }
-    .popup.show {
-      opacity:1;
-      pointer-events:auto;
-    }
+    .popup.show { opacity:1; pointer-events:auto; }
     .popup-card {
       max-width:min(88vw,980px);
       max-height:86vh;
@@ -223,13 +226,7 @@
       background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,250,253,0.95));
     }
     .popup.show .popup-card { transform: scale(1); }
-    .popup-card img {
-      width:100%;
-      height:100%;
-      object-fit:contain;
-      display:block;
-      background: #000;
-    }
+    .popup-card img { width:100%; height:100%; object-fit:contain; display:block; background:#000; }
     .popup-close {
       position:absolute;
       top:18px;
@@ -243,7 +240,7 @@
       box-shadow:0 8px 18px rgba(120,40,70,0.08);
     }
 
-    /* LOVE LETTER modal */
+    /* letter modal */
     .letter-modal {
       position:fixed;
       inset:0;
@@ -257,12 +254,9 @@
       transition: opacity 240ms ease;
       backdrop-filter: blur(4px) saturate(120%);
     }
-    .letter-modal.show {
-      opacity:1;
-      pointer-events:auto;
-    }
+    .letter-modal.show { opacity:1; pointer-events:auto; }
     .letter-card {
-      width:min(780px,86vw);
+      width:min(760px,86vw);
       max-height:86vh;
       background: linear-gradient(180deg, var(--paper), #fff);
       border-radius:14px;
@@ -276,7 +270,6 @@
       color:var(--ink);
     }
     .letter-modal.show .letter-card { transform: translateY(0) scale(1); }
-
     .letter-inner {
       background: linear-gradient(180deg,#fff8f4,#fffaf8);
       border-radius:8px;
@@ -284,92 +277,35 @@
       border: 1px solid rgba(220,160,170,0.08);
       box-shadow: inset 0 6px 18px rgba(240,200,210,0.06);
     }
+    .letter-title { margin:0 0 12px 0; font-size:22px; font-weight:700; color:#8b2b48; }
+    .letter-text { margin:0; font-size:18px; line-height:1.6; color:#4a2a36; white-space:pre-wrap; }
+    .letter-close { position:absolute; top:12px; right:12px; background:transparent; border:0; font-size:20px; cursor:pointer; padding:6px 8px; color:#6a3b47; }
 
-    .letter-title {
-      margin:0 0 12px 0;
-      font-size:22px;
-      font-weight:700;
-      color:#8b2b48;
-    }
-    .letter-text {
-      margin:0;
-      font-size:18px;
-      line-height:1.6;
-      color:#4a2a36;
-      white-space:pre-wrap;
-    }
-
-    .letter-close {
-      position:absolute;
-      top:12px;
-      right:12px;
-      background:transparent;
-      border:0;
-      font-size:20px;
-      cursor:pointer;
-      padding:6px 8px;
-      color:#6a3b47;
-    }
-
-    /* hearts */
-    .heart {
-      position:absolute;
-      width:26px;
-      height:26px;
-      background: linear-gradient(180deg,#ff6b81,#ff3b5c);
-      transform: rotate(-45deg);
-      left:50%;
-      top:50%;
-      border-radius:4px 4px 0 0;
-      pointer-events:none;
-      opacity:0.95;
-      animation: floatUp 2600ms linear forwards;
-      filter: drop-shadow(0 6px 14px rgba(120,40,70,0.12));
-    }
-    .heart::before, .heart::after {
-      content:"";
-      position:absolute;
-      width:26px;
-      height:26px;
-      background: linear-gradient(180deg,#ff6b81,#ff3b5c);
-      border-radius:50%;
-      top:-13px;
-      left:0;
-    }
+    /* hearts (unchanged) */
+    .heart { position:absolute; width:26px; height:26px; background: linear-gradient(180deg,#ff6b81,#ff3b5c); transform: rotate(-45deg); left:50%; top:50%; border-radius:4px 4px 0 0; pointer-events:none; opacity:0.95; animation: floatUp 2600ms linear forwards; filter: drop-shadow(0 6px 14px rgba(120,40,70,0.12)); }
+    .heart::before, .heart::after { content:""; position:absolute; width:26px; height:26px; background: linear-gradient(180deg,#ff6b81,#ff3b5c); border-radius:50%; top:-13px; left:0; }
     .heart::after { left:13px; top:0; }
-
-    @keyframes floatUp {
-      0% { transform: translateY(0) scale(.8) rotate(-45deg); opacity:1; }
-      30% { transform: translateY(-60px) scale(1.05) rotate(-35deg); }
-      70% { transform: translateY(-180px) scale(.95) rotate(-15deg); opacity:0.85; }
-      100% { transform: translateY(-320px) scale(.6) rotate(-5deg); opacity:0; }
-    }
+    @keyframes floatUp { 0% { transform: translateY(0) scale(.8) rotate(-45deg); opacity:1; } 30% { transform: translateY(-60px) scale(1.05) rotate(-35deg); } 70% { transform: translateY(-180px) scale(.95) rotate(-15deg); opacity:0.85; } 100% { transform: translateY(-320px) scale(.6) rotate(-5deg); opacity:0; } }
 
     /* small footer */
-    .footer {
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:10px;
-      margin-top:12px;
-      color:var(--muted);
-      font-size:13px;
-    }
+    .footer { display:flex; justify-content:center; align-items:center; gap:10px; margin-top:10px; color:var(--muted); font-size:13px; }
 
-    /* responsive */
-    @media (max-width:600px){
-      .center-gif{ width:160px; height:160px; top:28%; }
-      .yes-overlay img { width:120px; height:88px; }
-      .no-gallery img { width:64px; height:50px; }
-      #yesBtn, #noBtn { padding:10px 14px; font-size:16px; top:76%; }
-      .love-letter-btn { bottom:10%; left:50%; transform:translate(-50%,0); }
+    /* responsive tweaks */
+    @media (max-width:700px){
+      .center-gif{ width:140px; height:140px; top:26%; }
+      .yes-overlay img{ width:140px; height:96px; }
+      .no-gallery img{ width:60px; height:50px; }
+      #yesBtn,#noBtn { top:80%; padding:10px 14px; font-size:15px; }
+      .love-letter-btn { font-size:16px; padding:12px 18px; border-radius:12px; }
     }
   </style>
 </head>
 <body>
   <div class="card" role="main" aria-label="Valentine card for Mai">
-    <h1>Mai — will you be my Valentine?</h1>
-    <p class="lead">Click your answer. I promise it'll be fun either way 💌</p>
+    <header>
+      <h1>Mai — will you be my Valentine?</h1>
+      <p class="lead">Click your answer. I promise it'll be fun either way 💌</p>
+    </header>
 
     <div class="stage" id="stage">
       <div class="controls" aria-hidden="false">
@@ -387,7 +323,10 @@
         <img id="yesImg2" alt="surprise photo 2" />
         <img id="yesImg3" alt="surprise photo 3" />
       </div>
+    </div>
 
+    <!-- Love letter placed outside the stage (below it) to avoid overlapping photos -->
+    <div class="love-letter-wrap">
       <button id="loveLetterBtn" class="love-letter-btn" aria-hidden="true" aria-label="Open love letter">💌 Open Love Letter</button>
     </div>
 
@@ -455,7 +394,6 @@ u are the best thing that happened to me
     // center GIF path is in the img src attribute above (assets/center.gif)
     // ===================================================================
 
-    // Phrases and state
     const pleadingPhrases = [
       "Please, Mai... ❤️",
       "Don't break my heart 😢",
@@ -492,13 +430,11 @@ u are the best thing that happened to me
     }
     popupClose.addEventListener('click', hidePopup);
     popup.addEventListener('click', (e) => { if (e.target === popup) hidePopup(); });
-    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') hidePopup(); });
 
     // Letter modal controls
     function showLetter() {
       letterModal.classList.add('show');
       letterModal.setAttribute('aria-hidden', 'false');
-      // small flourish: reveal text with a slight delay for effect
       letterText.style.opacity = '0';
       setTimeout(()=> { letterText.style.transition = 'opacity 360ms ease'; letterText.style.opacity = '1'; }, 40);
     }
@@ -508,18 +444,12 @@ u are the best thing that happened to me
     }
     letterClose.addEventListener('click', hideLetter);
     letterModal.addEventListener('click', (e) => { if (e.target === letterModal) hideLetter(); });
-    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideLetter(); });
 
-    // Center GIF open popup handler
+    // center GIF interaction
     centerGif.addEventListener('click', () => showPopup(centerGif.src, 0));
-    centerGif.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        showPopup(centerGif.src, 0);
-      }
-    });
+    centerGif.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showPopup(centerGif.src, 0); } });
 
-    // Add thumbnail to no-gallery and optionally popup
+    // add thumbnail to no-gallery
     function addNoGalleryPhoto(popupNow = false){
       const idx = (noClicks - 1) % noImages.length;
       const srcBase = noImages[idx];
@@ -533,13 +463,9 @@ u are the best thing that happened to me
       img.onload = () => { setTimeout(()=> img.classList.add('show'), 40); };
       setTimeout(()=> img.classList.add('show'), 200);
 
-      while (noGallery.children.length > 6) {
-        noGallery.removeChild(noGallery.firstChild);
-      }
+      while (noGallery.children.length > 6) noGallery.removeChild(noGallery.firstChild);
 
-      if (popupNow) {
-        setTimeout(() => showPopup(src, 1400), 220);
-      }
+      if (popupNow) setTimeout(() => showPopup(src, 1400), 220);
     }
 
     // Yes button behavior:
@@ -553,7 +479,6 @@ u are the best thing that happened to me
       yesImg3.src = yesImages[2] + (yesImages[2].includes('?') ? '&' : '?') + "rand=" + Date.now();
 
       yesOverlay.classList.add('show');
-
       yesImg1.onclick = () => showPopup(yesImg1.src, 0);
       yesImg2.onclick = () => showPopup(yesImg2.src, 0);
       yesImg3.onclick = () => showPopup(yesImg3.src, 0);
@@ -570,37 +495,36 @@ u are the best thing that happened to me
       // 4) spawn hearts
       spawnHearts(28);
 
-      // 5) show love letter button after the photos appear
+      // 5) show love letter button after photos appear (placed below stage to avoid overlap)
       setTimeout(() => {
-        loveLetterBtn.style.display = 'block';
+        loveLetterBtn.style.display = 'inline-block';
         loveLetterBtn.setAttribute('aria-hidden', 'false');
-        // tiny entrance animation
+        // entrance flourish
         loveLetterBtn.animate([
-          { transform: 'translate(-50%,8px) scale(.96)', opacity: 0 },
-          { transform: 'translate(-50%,0) scale(1)', opacity: 1 }
+          { transform: 'scale(.92) translateY(8px)', opacity: 0 },
+          { transform: 'scale(1) translateY(0)', opacity: 1 }
         ], { duration: 420, easing: 'cubic-bezier(.2,.9,.2,1)' });
       }, 520);
 
-      // optionally disable controls briefly
+      // temporarily disable both buttons to avoid repeats
       disableControlsTemporary();
     });
 
-    // No button behavior (keeps previous playful features)
+    // No button behavior
     noBtn.addEventListener('click', (e) => {
       noClicks++;
       const phrase = pleadingPhrases[(noClicks - 1) % pleadingPhrases.length];
       noBtn.textContent = phrase;
       moveButtonRandomlyAvoidingCenter(noBtn);
-      yesScale += 0.08;
-      const yesBtn = document.getElementById('yesBtn');
+      yesScale += 0.06;
       yesBtn.style.transform = `translate(-50%,-50%) scale(${yesScale})`;
       addNoGalleryPhoto(true);
       yesBtn.animate([
         { transform: `translate(-50%,-50%) scale(${yesScale}) rotate(0deg)` },
-        { transform: `translate(-50%,-50%) scale(${yesScale + 0.04}) rotate(-6deg)` },
-        { transform: `translate(-50%,-50%) scale(${yesScale}) rotate(6deg)` },
+        { transform: `translate(-50%,-50%) scale(${yesScale + 0.03}) rotate(-5deg)` },
+        { transform: `translate(-50%,-50%) scale(${yesScale}) rotate(5deg)` },
         { transform: `translate(-50%,-50%) scale(${yesScale}) rotate(0deg)` }
-      ], { duration: 700, easing: 'ease-out' });
+      ], { duration: 600, easing: 'ease-out' });
     });
 
     // Move button randomly but avoid overlapping the centered GIF area (if visible)
@@ -616,7 +540,6 @@ u are the best thing that happened to me
       const minY = halfH + padding;
       const maxY = rect.height - halfH - padding;
 
-      // If centerGif is hidden or not displayed, don't avoid it
       const gifVisible = centerGif.offsetParent !== null && centerGif.style.display !== 'none';
       let gifArea = null;
       if (gifVisible) {
@@ -627,7 +550,7 @@ u are the best thing that happened to me
           right: Math.min(rect.width, centerRect.right - rect.left),
           bottom: Math.min(rect.height, centerRect.bottom - rect.top)
         };
-        const avoidPadding = 14;
+        const avoidPadding = 10;
         gifArea.x1 = gifArea.left - avoidPadding;
         gifArea.y1 = gifArea.top - avoidPadding;
         gifArea.x2 = gifArea.right + avoidPadding;
@@ -639,31 +562,16 @@ u are the best thing that happened to me
       while (attempts < 18) {
         const candidateX = randInt(minX, Math.max(minX, Math.floor(maxX)));
         const candidateY = randInt(minY, Math.max(minY, Math.floor(maxY)));
-        if (!gifArea) {
-          chosenX = candidateX;
-          chosenY = candidateY;
-          break;
-        }
-        const candidateRect = {
-          left: candidateX - halfW,
-          top: candidateY - halfH,
-          right: candidateX + halfW,
-          bottom: candidateY + halfH
-        };
+        if (!gifArea) { chosenX = candidateX; chosenY = candidateY; break; }
+        const candidateRect = { left: candidateX - halfW, top: candidateY - halfH, right: candidateX + halfW, bottom: candidateY + halfH };
         const overlap = !(candidateRect.right < gifArea.x1 || candidateRect.left > gifArea.x2 || candidateRect.bottom < gifArea.y1 || candidateRect.top > gifArea.y2);
-        if (!overlap) {
-          chosenX = candidateX;
-          chosenY = candidateY;
-          break;
-        }
+        if (!overlap) { chosenX = candidateX; chosenY = candidateY; break; }
         attempts++;
       }
-
       if (chosenX === undefined) {
         const tryY = Math.min(maxY, Math.max(minY, Math.round((gifArea ? gifArea.y2 : rect.height/2) + halfH + 8)));
         const tryX = randInt(minX, Math.max(minX, Math.floor(maxX)));
-        chosenX = tryX;
-        chosenY = tryY;
+        chosenX = tryX; chosenY = tryY;
       }
 
       btn.style.left = chosenX + "px";
@@ -703,12 +611,12 @@ u are the best thing that happened to me
       }
     }
 
-    // init positions so CSS translate(-50%,-50%) centers the buttons below the GIF
+    // init positions (buttons placed lower than center GIF)
     function initButtonPositions(){
       const rect = stage.getBoundingClientRect();
       const centerX = Math.floor(rect.width/2);
       const centerY = Math.floor(rect.height/2);
-      const belowOffset = Math.round(rect.height * 0.22);
+      const belowOffset = Math.round(rect.height * 0.28);
       noBtn.style.left = (centerX - 80) + 'px';
       noBtn.style.top = (centerY + belowOffset) + 'px';
       yesBtn.style.left = (centerX + 80) + 'px';
@@ -720,31 +628,20 @@ u are the best thing that happened to me
     window.addEventListener('load', initButtonPositions);
     window.addEventListener('resize', initButtonPositions);
 
-    // popup bindings for thumbnails (No gallery): added dynamically in addNoGalleryPhoto
-
-    // Love letter button action: open letter modal
-    loveLetterBtn.addEventListener('click', () => showLetter());
+    // Love letter button binding
+    loveLetterBtn.addEventListener('click', showLetter);
     loveLetterBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showLetter(); } });
 
-    // Show letter (text is already in DOM as requested)
-    function showLetter() {
-      letterModal.classList.add('show');
-      letterModal.setAttribute('aria-hidden', 'false');
-      letterText.style.opacity = '0';
-      setTimeout(()=> {
-        letterText.style.transition = 'opacity 360ms ease';
-        letterText.style.opacity = '1';
-      }, 40);
-    }
-
-    // Make sure any popup or letter close responds to ESC
+    // keyboard for popup/letter close
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        hidePopup();
-        hideLetter();
-      }
+      if (e.key === 'Escape') { hidePopup(); hideLetter(); }
     });
 
+    // make sure overlay images open popup (these are set when yes clicked)
+    // addNoGalleryPhoto will set on-click for no thumbs
+
+    // helper to hide letter
+    function hideLetter() { letterModal.classList.remove('show'); letterModal.setAttribute('aria-hidden', 'true'); }
   </script>
 </body>
 </html>
