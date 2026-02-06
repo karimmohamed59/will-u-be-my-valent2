@@ -9,13 +9,15 @@
       --bg: #fff0f6;
       --accent: #ff4d6d;
       --muted: #7a536b;
+      --paper: #fff8f5;
+      --ink: #3b1f2b;
     }
     html,body{
       height:100%;
       margin:0;
       font-family: "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
       background: radial-gradient(circle at 10% 10%, #fff0f6 0%, #fff 30%), linear-gradient(180deg,#ffeef2 0%, #fff0f6 100%);
-      color:#3b1f2b;
+      color:var(--ink);
       display:flex;
       align-items:center;
       justify-content:center;
@@ -25,10 +27,10 @@
       position:relative;
       width:min(920px, 95vw);
       height:min(680px, 85vh);
-      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,240,246,0.9));
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,240,246,0.9));
       border-radius:18px;
       box-shadow: 0 12px 40px rgba(120,40,70,0.12);
-      padding:30px;
+      padding:28px;
       overflow:hidden;
       border:1px solid rgba(255,255,255,0.6);
     }
@@ -42,7 +44,7 @@
     }
     p.lead{
       text-align:center;
-      margin:12px 0 28px;
+      margin:12px 0 20px;
       color:var(--muted);
       font-size:clamp(14px, 1.6vw, 18px);
     }
@@ -50,7 +52,7 @@
     .stage {
       position:relative;
       width:100%;
-      height:60%;
+      height:62%;
       border-radius:12px;
       background: radial-gradient(circle at 10% 20%, rgba(255,255,255,0.65), transparent 10%),
                   linear-gradient(180deg, rgba(255,240,246,0.6), rgba(255, 245, 248, 0.2));
@@ -72,6 +74,7 @@
       transition: left 700ms cubic-bezier(.2,.9,.2,1), top 700ms cubic-bezier(.2,.9,.2,1), transform 350ms;
       position:absolute;
       transform: translate(-50%,-50%);
+      background: #fff;
     }
 
     .btn:active { transform: translate(-50%,-50%) translateY(2px); }
@@ -86,15 +89,15 @@
       border:2px solid rgba(255,77,109,0.12);
     }
 
-    /* initial positions (buttons slightly lower to avoid center GIF) */
-    #yesBtn { left:calc(50% + 80px); top:64%; }
-    #noBtn  { left:calc(50% - 80px); top:64%; }
+    /* buttons sit lower than the stage center so the center GIF has space */
+    #yesBtn { left:calc(50% + 80px); top:68%; }
+    #noBtn  { left:calc(50% - 80px); top:68%; }
 
     /* centered GIF (higher on screen so it doesn't overlap buttons) */
     .center-gif{
       position:absolute;
       left:50%;
-      top:34%;               /* moved higher so buttons don't overlap */
+      top:32%;
       transform:translate(-50%,-50%);
       width:240px;
       height:240px;
@@ -104,7 +107,8 @@
       cursor:pointer;
       z-index:20;
       pointer-events: auto;
-      background: transparent; /* no border, seamless */
+      background: transparent;
+      display:block;
     }
 
     /* photo gallery for no-clicks (bottom-left) */
@@ -129,7 +133,6 @@
       opacity:0;
       transform: translateY(12px) scale(.98);
       transition: opacity 450ms, transform 450ms;
-      /* removed border so it looks clean */
       cursor: pointer;
       background: transparent;
     }
@@ -165,10 +168,28 @@
       transform:scale(.98);
       transition: transform 450ms, box-shadow 300ms;
       cursor: pointer;
-      background: transparent; /* no border */
+      background: transparent;
     }
     .yes-overlay.show img { transform:scale(1); }
     .yes-overlay img:hover { transform: scale(1.04); box-shadow: 0 18px 50px rgba(120,40,70,0.2); }
+
+    /* Love letter button (appears after yes) */
+    .love-letter-btn {
+      position:absolute;
+      bottom:14%;
+      left:50%;
+      transform:translate(-50%,0);
+      z-index:12;
+      padding:12px 18px;
+      border-radius:12px;
+      border:0;
+      background: linear-gradient(90deg,#ffd6e0,#ff9fb8);
+      color:#5a2336;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow: 0 12px 28px rgba(200,80,110,0.12);
+      display:none; /* shown after yes */
+    }
 
     /* popup (center big photo/GIF) */
     .popup {
@@ -213,13 +234,81 @@
       position:absolute;
       top:18px;
       right:18px;
-      background:rgba(255,255,255,0.85);
+      background:rgba(255,255,255,0.9);
       border-radius:999px;
       border:0;
       padding:6px 10px;
       cursor:pointer;
       font-weight:600;
       box-shadow:0 8px 18px rgba(120,40,70,0.08);
+    }
+
+    /* LOVE LETTER modal */
+    .letter-modal {
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(10,6,10,0.45);
+      z-index:10010;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity 240ms ease;
+      backdrop-filter: blur(4px) saturate(120%);
+    }
+    .letter-modal.show {
+      opacity:1;
+      pointer-events:auto;
+    }
+    .letter-card {
+      width:min(780px,86vw);
+      max-height:86vh;
+      background: linear-gradient(180deg, var(--paper), #fff);
+      border-radius:14px;
+      padding:26px;
+      box-shadow: 0 30px 90px rgba(30,10,20,0.35);
+      transform: translateY(8px) scale(.96);
+      transition: transform 260ms cubic-bezier(.2,.9,.2,1);
+      overflow:auto;
+      position:relative;
+      font-family: Georgia, "Times New Roman", Times, serif;
+      color:var(--ink);
+    }
+    .letter-modal.show .letter-card { transform: translateY(0) scale(1); }
+
+    .letter-inner {
+      background: linear-gradient(180deg,#fff8f4,#fffaf8);
+      border-radius:8px;
+      padding:28px;
+      border: 1px solid rgba(220,160,170,0.08);
+      box-shadow: inset 0 6px 18px rgba(240,200,210,0.06);
+    }
+
+    .letter-title {
+      margin:0 0 12px 0;
+      font-size:22px;
+      font-weight:700;
+      color:#8b2b48;
+    }
+    .letter-text {
+      margin:0;
+      font-size:18px;
+      line-height:1.6;
+      color:#4a2a36;
+      white-space:pre-wrap;
+    }
+
+    .letter-close {
+      position:absolute;
+      top:12px;
+      right:12px;
+      background:transparent;
+      border:0;
+      font-size:20px;
+      cursor:pointer;
+      padding:6px 8px;
+      color:#6a3b47;
     }
 
     /* hearts */
@@ -272,7 +361,8 @@
       .center-gif{ width:160px; height:160px; top:28%; }
       .yes-overlay img { width:120px; height:88px; }
       .no-gallery img { width:64px; height:50px; }
-      #yesBtn, #noBtn { padding:10px 14px; font-size:16px; top:72%; }
+      #yesBtn, #noBtn { padding:10px 14px; font-size:16px; top:76%; }
+      .love-letter-btn { bottom:10%; left:50%; transform:translate(-50%,0); }
     }
   </style>
 </head>
@@ -297,6 +387,8 @@
         <img id="yesImg2" alt="surprise photo 2" />
         <img id="yesImg3" alt="surprise photo 3" />
       </div>
+
+      <button id="loveLetterBtn" class="love-letter-btn" aria-hidden="true" aria-label="Open love letter">💌 Open Love Letter</button>
     </div>
 
     <div class="footer">Tip: if music doesn't play automatically, try clicking the page again — browsers require interaction for audio.</div>
@@ -308,6 +400,21 @@
       <img id="popupImg" alt="Large view" />
     </div>
     <button id="popupClose" class="popup-close" aria-label="Close">✕</button>
+  </div>
+
+  <!-- Letter modal -->
+  <div id="letterModal" class="letter-modal" aria-hidden="true">
+    <div class="letter-card" role="dialog" aria-modal="true" aria-label="Love letter">
+      <button id="letterClose" class="letter-close" aria-label="Close letter">✕</button>
+      <div class="letter-inner" id="letterInner">
+        <h3 class="letter-title">To Mai</h3>
+        <p class="letter-text" id="letterText">
+i love u mai
+from all my heart
+u are the best thing that happened to me
+        </p>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -322,6 +429,11 @@
     const yesImg3 = document.getElementById('yesImg3');
 
     const centerGif = document.getElementById('centerGif');
+
+    const loveLetterBtn = document.getElementById('loveLetterBtn');
+    const letterModal = document.getElementById('letterModal');
+    const letterClose = document.getElementById('letterClose');
+    const letterText = document.getElementById('letterText');
 
     const popup = document.getElementById('popup');
     const popupImg = document.getElementById('popupImg');
@@ -343,6 +455,7 @@
     // center GIF path is in the img src attribute above (assets/center.gif)
     // ===================================================================
 
+    // Phrases and state
     const pleadingPhrases = [
       "Please, Mai... ❤️",
       "Don't break my heart 😢",
@@ -361,7 +474,7 @@
 
     function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-    // Show popup with a large image/GIF.
+    // Generic popup for images/GIFs
     function showPopup(src, autoCloseMs = 0) {
       if (!src) return;
       popupImg.src = src + (src.includes('?') ? '&' : '?') + 'rand=' + Date.now();
@@ -372,18 +485,32 @@
         setTimeout(hidePopup, autoCloseMs);
       }
     }
-
     function hidePopup() {
       popup.classList.remove('show');
       popup.setAttribute('aria-hidden', 'true');
       setTimeout(() => { popupImg.src = ''; }, 300);
     }
-
     popupClose.addEventListener('click', hidePopup);
     popup.addEventListener('click', (e) => { if (e.target === popup) hidePopup(); });
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape') hidePopup(); });
 
-    // Make center GIF open popup on click or keyboard (Enter/Space)
+    // Letter modal controls
+    function showLetter() {
+      letterModal.classList.add('show');
+      letterModal.setAttribute('aria-hidden', 'false');
+      // small flourish: reveal text with a slight delay for effect
+      letterText.style.opacity = '0';
+      setTimeout(()=> { letterText.style.transition = 'opacity 360ms ease'; letterText.style.opacity = '1'; }, 40);
+    }
+    function hideLetter() {
+      letterModal.classList.remove('show');
+      letterModal.setAttribute('aria-hidden', 'true');
+    }
+    letterClose.addEventListener('click', hideLetter);
+    letterModal.addEventListener('click', (e) => { if (e.target === letterModal) hideLetter(); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideLetter(); });
+
+    // Center GIF open popup handler
     centerGif.addEventListener('click', () => showPopup(centerGif.src, 0));
     centerGif.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -392,103 +519,7 @@
       }
     });
 
-    // When No is clicked
-    noBtn.addEventListener('click', (e) => {
-      noClicks++;
-
-      // 1) Change text to a random pleading phrase
-      const phrase = pleadingPhrases[(noClicks - 1) % pleadingPhrases.length];
-      noBtn.textContent = phrase;
-
-      // 2) Move no button to a fun random place inside the stage (click-triggered), avoiding center GIF
-      moveButtonRandomlyAvoidingCenter(noBtn);
-
-      // 3) Make yes button bigger
-      yesScale += 0.08;
-      yesBtn.style.transform = `translate(-50%,-50%) scale(${yesScale})`;
-
-      // 4) Show a photo (append to noGallery) and pop it up to center briefly
-      addNoGalleryPhoto(true);
-
-      // small playful wiggle on yes button to draw attention
-      yesBtn.animate([
-        { transform: `translate(-50%,-50%) scale(${yesScale}) rotate(0deg)` },
-        { transform: `translate(-50%,-50%) scale(${yesScale + 0.04}) rotate(-6deg)` },
-        { transform: `translate(-50%,-50%) scale(${yesScale}) rotate(6deg)` },
-        { transform: `translate(-50%,-50%) scale(${yesScale}) rotate(0deg)` }
-      ], {
-        duration: 700,
-        easing: 'ease-out'
-      });
-    });
-
-    // Move button randomly but avoid overlapping the centered GIF area.
-    function moveButtonRandomlyAvoidingCenter(btn){
-      const rect = stage.getBoundingClientRect();
-      const btnRect = btn.getBoundingClientRect();
-      const centerRect = centerGif.getBoundingClientRect();
-
-      const padding = 12; // keep away from stage edges
-      const halfW = btnRect.width / 2;
-      const halfH = btnRect.height / 2;
-      const minX = halfW + padding;
-      const maxX = rect.width - halfW - padding;
-      const minY = halfH + padding;
-      const maxY = rect.height - halfH - padding;
-
-      // center GIF area relative to stage
-      const gifRel = {
-        left: Math.max(0, centerRect.left - rect.left),
-        top: Math.max(0, centerRect.top - rect.top),
-        right: Math.min(rect.width, centerRect.right - rect.left),
-        bottom: Math.min(rect.height, centerRect.bottom - rect.top)
-      };
-
-      const avoidPadding = 14; // extra space around GIF to avoid feeling cramped
-      const gifArea = {
-        x1: gifRel.left - avoidPadding,
-        y1: gifRel.top - avoidPadding,
-        x2: gifRel.right + avoidPadding,
-        y2: gifRel.bottom + avoidPadding
-      };
-
-      // Try a few times to find a random spot that doesn't overlap the GIF area
-      let attempts = 0;
-      let chosenX, chosenY;
-      while (attempts < 18) {
-        const candidateX = randInt(minX, Math.max(minX, Math.floor(maxX)));
-        const candidateY = randInt(minY, Math.max(minY, Math.floor(maxY)));
-        const candidateRect = {
-          left: candidateX - halfW,
-          top: candidateY - halfH,
-          right: candidateX + halfW,
-          bottom: candidateY + halfH
-        };
-        // check overlap
-        const overlap = !(candidateRect.right < gifArea.x1 || candidateRect.left > gifArea.x2 || candidateRect.bottom < gifArea.y1 || candidateRect.top > gifArea.y2);
-        if (!overlap) {
-          chosenX = candidateX;
-          chosenY = candidateY;
-          break;
-        }
-        attempts++;
-      }
-
-      // If no safe spot found after attempts, pick a spot below the GIF (if possible)
-      if (chosenX === undefined) {
-        // try below GIF
-        const tryY = Math.min(maxY, Math.max(minY, Math.round(gifArea.y2 + halfH + 10)));
-        const tryX = randInt(minX, Math.max(minX, Math.floor(maxX)));
-        chosenX = tryX;
-        chosenY = tryY;
-      }
-
-      btn.style.left = chosenX + "px";
-      btn.style.top = chosenY + "px";
-      btn.style.transform = 'translate(-50%,-50%)';
-    }
-
-    // Add a thumbnail to the no-gallery. If popupNow=true show it centered briefly.
+    // Add thumbnail to no-gallery and optionally popup
     function addNoGalleryPhoto(popupNow = false){
       const idx = (noClicks - 1) % noImages.length;
       const srcBase = noImages[idx];
@@ -496,7 +527,7 @@
       const img = document.createElement('img');
       img.src = src;
       img.alt = "cute photo";
-      img.addEventListener('click', () => showPopup(src, 0)); // click to open until manually closed
+      img.addEventListener('click', () => showPopup(src, 0));
       noGallery.appendChild(img);
 
       img.onload = () => { setTimeout(()=> img.classList.add('show'), 40); };
@@ -506,26 +537,28 @@
         noGallery.removeChild(noGallery.firstChild);
       }
 
-      // pop it to the center briefly for Mai
       if (popupNow) {
         setTimeout(() => showPopup(src, 1400), 220);
       }
     }
 
-    // When Yes clicked
+    // Yes button behavior:
     yesBtn.addEventListener('click', async (e) => {
+      // 1) hide center GIF
+      centerGif.style.display = 'none';
+
+      // 2) show three photos
       yesImg1.src = yesImages[0] + (yesImages[0].includes('?') ? '&' : '?') + "rand=" + Date.now();
       yesImg2.src = yesImages[1] + (yesImages[1].includes('?') ? '&' : '?') + "rand=" + Date.now();
       yesImg3.src = yesImages[2] + (yesImages[2].includes('?') ? '&' : '?') + "rand=" + Date.now();
 
       yesOverlay.classList.add('show');
 
-      // clicking overlay photos opens the big popup for manual viewing
       yesImg1.onclick = () => showPopup(yesImg1.src, 0);
       yesImg2.onclick = () => showPopup(yesImg2.src, 0);
       yesImg3.onclick = () => showPopup(yesImg3.src, 0);
 
-      // Play music
+      // 3) play music
       try {
         const audio = new Audio(musicUrl);
         audio.volume = 0.85;
@@ -534,12 +567,109 @@
         console.warn("Audio play failed (browser autoplay policy). Try clicking again.", err);
       }
 
-      // Spawn hearts randomly for a few seconds
-      spawnHearts(26);
+      // 4) spawn hearts
+      spawnHearts(28);
 
-      // Optionally, lock the buttons briefly
+      // 5) show love letter button after the photos appear
+      setTimeout(() => {
+        loveLetterBtn.style.display = 'block';
+        loveLetterBtn.setAttribute('aria-hidden', 'false');
+        // tiny entrance animation
+        loveLetterBtn.animate([
+          { transform: 'translate(-50%,8px) scale(.96)', opacity: 0 },
+          { transform: 'translate(-50%,0) scale(1)', opacity: 1 }
+        ], { duration: 420, easing: 'cubic-bezier(.2,.9,.2,1)' });
+      }, 520);
+
+      // optionally disable controls briefly
       disableControlsTemporary();
     });
+
+    // No button behavior (keeps previous playful features)
+    noBtn.addEventListener('click', (e) => {
+      noClicks++;
+      const phrase = pleadingPhrases[(noClicks - 1) % pleadingPhrases.length];
+      noBtn.textContent = phrase;
+      moveButtonRandomlyAvoidingCenter(noBtn);
+      yesScale += 0.08;
+      const yesBtn = document.getElementById('yesBtn');
+      yesBtn.style.transform = `translate(-50%,-50%) scale(${yesScale})`;
+      addNoGalleryPhoto(true);
+      yesBtn.animate([
+        { transform: `translate(-50%,-50%) scale(${yesScale}) rotate(0deg)` },
+        { transform: `translate(-50%,-50%) scale(${yesScale + 0.04}) rotate(-6deg)` },
+        { transform: `translate(-50%,-50%) scale(${yesScale}) rotate(6deg)` },
+        { transform: `translate(-50%,-50%) scale(${yesScale}) rotate(0deg)` }
+      ], { duration: 700, easing: 'ease-out' });
+    });
+
+    // Move button randomly but avoid overlapping the centered GIF area (if visible)
+    function moveButtonRandomlyAvoidingCenter(btn){
+      const rect = stage.getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+
+      const padding = 12;
+      const halfW = btnRect.width / 2;
+      const halfH = btnRect.height / 2;
+      const minX = halfW + padding;
+      const maxX = rect.width - halfW - padding;
+      const minY = halfH + padding;
+      const maxY = rect.height - halfH - padding;
+
+      // If centerGif is hidden or not displayed, don't avoid it
+      const gifVisible = centerGif.offsetParent !== null && centerGif.style.display !== 'none';
+      let gifArea = null;
+      if (gifVisible) {
+        const centerRect = centerGif.getBoundingClientRect();
+        gifArea = {
+          left: Math.max(0, centerRect.left - rect.left),
+          top: Math.max(0, centerRect.top - rect.top),
+          right: Math.min(rect.width, centerRect.right - rect.left),
+          bottom: Math.min(rect.height, centerRect.bottom - rect.top)
+        };
+        const avoidPadding = 14;
+        gifArea.x1 = gifArea.left - avoidPadding;
+        gifArea.y1 = gifArea.top - avoidPadding;
+        gifArea.x2 = gifArea.right + avoidPadding;
+        gifArea.y2 = gifArea.bottom + avoidPadding;
+      }
+
+      let attempts = 0;
+      let chosenX, chosenY;
+      while (attempts < 18) {
+        const candidateX = randInt(minX, Math.max(minX, Math.floor(maxX)));
+        const candidateY = randInt(minY, Math.max(minY, Math.floor(maxY)));
+        if (!gifArea) {
+          chosenX = candidateX;
+          chosenY = candidateY;
+          break;
+        }
+        const candidateRect = {
+          left: candidateX - halfW,
+          top: candidateY - halfH,
+          right: candidateX + halfW,
+          bottom: candidateY + halfH
+        };
+        const overlap = !(candidateRect.right < gifArea.x1 || candidateRect.left > gifArea.x2 || candidateRect.bottom < gifArea.y1 || candidateRect.top > gifArea.y2);
+        if (!overlap) {
+          chosenX = candidateX;
+          chosenY = candidateY;
+          break;
+        }
+        attempts++;
+      }
+
+      if (chosenX === undefined) {
+        const tryY = Math.min(maxY, Math.max(minY, Math.round((gifArea ? gifArea.y2 : rect.height/2) + halfH + 8)));
+        const tryX = randInt(minX, Math.max(minX, Math.floor(maxX)));
+        chosenX = tryX;
+        chosenY = tryY;
+      }
+
+      btn.style.left = chosenX + "px";
+      btn.style.top = chosenY + "px";
+      btn.style.transform = 'translate(-50%,-50%)';
+    }
 
     function disableControlsTemporary(){
       noBtn.disabled = true;
@@ -554,12 +684,13 @@
       }, 6000);
     }
 
+    // Hearts effect
     function spawnHearts(count=20){
       const stageRect = stage.getBoundingClientRect();
       for(let i=0;i<count;i++){
         const heart = document.createElement('div');
         heart.className = 'heart';
-        const size = randInt(18, 40);
+        const size = randInt(18, 48);
         heart.style.width = size + 'px';
         heart.style.height = size + 'px';
         heart.style.left = randInt(10, Math.max(10, stageRect.width - 30)) + 'px';
@@ -568,20 +699,16 @@
         heart.style.animationDelay = (Math.random()*800) + 'ms';
         heart.style.opacity = 0.95 - Math.random()*0.2;
         stage.appendChild(heart);
-
-        setTimeout(()=> {
-          heart.remove();
-        }, 3400 + Math.random()*800);
+        setTimeout(()=> { heart.remove(); }, 3400 + Math.random()*800);
       }
     }
 
-    // initialize positions so CSS translate(-50%,-50%) centers the buttons below the GIF
+    // init positions so CSS translate(-50%,-50%) centers the buttons below the GIF
     function initButtonPositions(){
       const rect = stage.getBoundingClientRect();
       const centerX = Math.floor(rect.width/2);
       const centerY = Math.floor(rect.height/2);
-      // place buttons lower than centerGIF area
-      const belowOffset = Math.round(rect.height * 0.18);
+      const belowOffset = Math.round(rect.height * 0.22);
       noBtn.style.left = (centerX - 80) + 'px';
       noBtn.style.top = (centerY + belowOffset) + 'px';
       yesBtn.style.left = (centerX + 80) + 'px';
@@ -592,6 +719,32 @@
 
     window.addEventListener('load', initButtonPositions);
     window.addEventListener('resize', initButtonPositions);
+
+    // popup bindings for thumbnails (No gallery): added dynamically in addNoGalleryPhoto
+
+    // Love letter button action: open letter modal
+    loveLetterBtn.addEventListener('click', () => showLetter());
+    loveLetterBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showLetter(); } });
+
+    // Show letter (text is already in DOM as requested)
+    function showLetter() {
+      letterModal.classList.add('show');
+      letterModal.setAttribute('aria-hidden', 'false');
+      letterText.style.opacity = '0';
+      setTimeout(()=> {
+        letterText.style.transition = 'opacity 360ms ease';
+        letterText.style.opacity = '1';
+      }, 40);
+    }
+
+    // Make sure any popup or letter close responds to ESC
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        hidePopup();
+        hideLetter();
+      }
+    });
+
   </script>
 </body>
 </html>
